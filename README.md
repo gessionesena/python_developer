@@ -1,2 +1,2 @@
-# python_developer
-Testes e Desafios em Python 
+# Sistema Bancário em Python
+Sistema bancário simples na linguagem Python
