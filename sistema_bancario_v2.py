@@ -9,8 +9,8 @@ saldo = 0
 qtd_saques = 0
 limite = 500
 LIMITE_SAQUES = 3
-depositos = []
-saques = []
+extrato = ''
+
 #**********Função para depósito**********************************
 def depositar(valor_deposito,saldo_total,/):#argumentos chamados apenas por posição
     saldo_atual = saldo_total + valor_deposito
@@ -24,27 +24,32 @@ def sacar(*,valor_saque,saldo_total):#argumentos chamados apenas por nomes
     return saldo_atual    
 #****************************************************************
 #**********Função para extrato**********************************
-def mostrar_extrato(valores_deposito,valores_saques,saldo_total,/):#argumentos chamados apenas por posição
+def mostrar_extrato(movimentacao,/,*,saldo_total):#argumentos chamados apenas por posição
+    if extrato == '':
+        #saida = (f"\n{f'Sem movimentação':>31}" if extrato == '' else movimentacao)
+        saida = f"{f'Sem movimentação':>31}\n{'_'*31}\n{f'Saldo: R$ {saldo_total:.2f}  ':>31}\n"
+    else:
+        saida = f"{movimentacao}\n{'_'*31}\n{f'Saldo: R$ {saldo_total:.2f}  ':>31}\n"
     
-    
-    return 
+    return saida
 #****************************************************************
 
 while True:
     opcao = input(menu)
     
-    #FUNÇÃO DEPÓSITO
+    #MÓDULO DEPÓSITO
     if opcao == 'd' or opcao == 'D':
 
         valor = float(input('Digite o valor a ser depositado: '))
         if valor > 0:
             saldo = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar 
-            depositos.append(valor)#adicionando valor do deposito na lista de depositos realizados
-            print(f'Depósito no valor de R$ {valor:.2f} realizado com sucesso!')
+            extrato = f"{extrato}\n {f'R$ {valor:.2f} C':>30}"
+            print(f"Depósito no valor de R$ {valor:.2f} realizado com sucesso!")
+            
         else:
             print('Valor incorreto. Tente outro valor!')
     
-    #FUNÇÃO SAQUE
+    #MÓDULO SAQUE
     elif opcao == 's' or opcao == 'S':
         valor = float(input('Digite o valor a ser sacado:'))
         lim_valor_excedido = valor > limite
@@ -58,31 +63,21 @@ while True:
                 print('Limite de saque diário excedido!')
             elif valor <= saldo:
                 saldo = sacar(valor_saque = valor,saldo_total = saldo)#atualizando a variavel saldo com o retorno da função sacar com argumentos passados apenas por nomes
-                saques.append(valor)
                 qtd_saques += 1
-                print(f'Saque no valor de R$ {valor:.2f} realizado com sucesso!')
+                extrato = f"{extrato}\n {f'R$ {valor:.2f} D':>30}"
+                print(f"Saque no valor de R$ {valor:.2f} realizado com sucesso!")
                     
             elif saldo <= 0:
                 print('Saldo Insuficiente!')
 
-    #FUNÇÃO EXTRATO
+    #MÓDULO EXTRATO
     elif opcao == 'e' or opcao == 'E':
         
-        def listar_valores(lista):
-            for valores in lista:
-                print(f'R$ {valores:.2f}')
-        
-        print('*********************\n--- E X T R A T O ---\n*********************\nCréditos\n')
-        
-        print('Nenhuma movimentação!') if not depositos else listar_valores(depositos)#condição para verificar se a lista está vazia
+        print(f"{'*'*31}\n{'E X T R A T O':^31}\n{'_'*31}")
+        print(mostrar_extrato(extrato,saldo_total=saldo))#chamando função mostrarextrato() com argumentos posicionais e nominais
+        print(f"{'*' *31}")  
 
-        print('\nDébitos\n')
-
-        print('Nenhuma movimentação!') if not saques else listar_valores(saques)#condição para verificar se a lista está vazia
-
-        print(f'\n---------------------\nSaldo: {saldo:.2f}\n*********************\n')     
-
-    #FUNÇÃO SAIR
+    #SAIR
     elif opcao == 'q' or opcao == 'Q':
         break
     
