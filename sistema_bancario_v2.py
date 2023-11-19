@@ -70,7 +70,8 @@ def abrir_conta(usuarios,contas,cpf):
     if teste == True:
         AGENCIA = '0001'
         conta_corrente = len(contas) + 1
-        dados_conta = dict({'conta':conta_corrente,'agencia':AGENCIA, 'usuario':cpf})  
+        saldo = 0
+        dados_conta = dict({'conta':conta_corrente,'agencia':AGENCIA, 'usuario':cpf, 'saldo':saldo})  
     return dados_conta if teste == True else f'Usuário {cpf} não existe no banco de dados!'
 #****************************************************************
 #**********Função listar contas**********************************
@@ -93,29 +94,41 @@ while True:
         
         if isinstance(busca,dict):#caso o usuario exista, é hora de verificar se possui conta aberta
             search = buscar_contas(contas,cpf_usuario)
-            if isinstance(search,list):
+            if isinstance(search,list):#se a saida da função search for uma lista, isso quer dizer que há conta para o usuario buscado
                 print(f"Contas vinculadas ao CPF {cpf_usuario}:\n{'_'*20}")
-                for item in search:#listando todas as contas vinculadas ao usuario
-                    print(f"Agência: {item['agencia']}\nConta Nº: {item['conta']}\n{'-'*20}")
+                for item in search:#iterando todas as contas vinculadas ao usuario
+                    print(f"Agência: {item['agencia']}\nConta Nº: {item['conta']}\nSaldo: {item['saldo']:.2f}\n{'-'*20}")
                 if len(search) == 1:#se usuario possuir apenas 1 conta
                     valor = float(input('Digite o valor a ser depositado: '))
                     if valor > 0:
-                        saldo = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar 
+                        for item in search:
+                            item['saldo'] = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar
+                        #saldo = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar 
                         extrato = f"{extrato}\n {f'R$ {valor:.2f} C':>30}"
                         print(f"Depósito no valor de R$ {valor:.2f} realizado com sucesso!")
                         
                     else:
                         print('Valor incorreto. Tente outro valor!')
                 else:#caso possua mais de uma conta, deverá escolher
-                    escolha_conta = input('Qual conta deseja depositar? Digite o N° da conta: ')
-                    valor = float(input('Digite o valor a ser depositado: '))
-                    if valor > 0:
-                        saldo = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar 
-                        extrato = f"{extrato}\n {f'R$ {valor:.2f} C':>30}"
-                        print(f"Depósito no valor de R$ {valor:.2f} realizado com sucesso!")
+                    while True:#laço para a escolha da conta até um numero de conta valido ser digitado
+                        escolha_conta = int(input('Qual conta deseja depositar? Digite o N° da conta: '))
                         
-                    else:
-                        print('Valor incorreto. Tente outro valor!')
+                        for item in search:
+                            teste = False #teste para caso o numero digitado não coincida com nenhuma conta do usuario
+                            if escolha_conta == item['conta']:
+                                teste = True
+                                valor = float(input('Digite o valor a ser depositado: '))
+                                if valor > 0:
+                                    item['saldo'] = depositar(valor,saldo)#atualizando a variavel saldo com o retorno da função depositar
+                                    extrato = f"{extrato}\n {f'R$ {valor:.2f} C':>30}"
+                                    print(f"Depósito no valor de R$ {valor:.2f} realizado com sucesso!")
+                                else:
+                                    print('Valor incorreto. Tente outro valor!')
+                        
+                        if teste == True:
+                            break #parada do laço while
+                        else:
+                            print(f"Conta digitada não coincide com nenhuma conta vinculada ao usuário {busca['nome']}")
             else:
                 print(search)
         else:
@@ -194,7 +207,7 @@ while True:
 
     #SAIR
     elif opcao == 'Q':
-        break
+          break
     
     else:
         print('Opção inválida. Escolha outra opção!')
