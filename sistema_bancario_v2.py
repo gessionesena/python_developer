@@ -81,7 +81,15 @@ def buscar_contas(contas,cpf):
         item = conta['usuario']
         if cpf == item:
             list.append(conta)
-    return f'Não há contas vinculadas ao CPF informado!' if list == [] else list
+    return f'Não há contas vinculadas ao CPF informado!' if list == [] else list   
+#****************************************************************
+#**********Função VALIDAR CPF**********************************
+def valida_cpf(cpf):
+    cpf = cpf.strip()#verificar essa parte
+    if cpf.isdigit() and len(cpf) == 11:
+        return True
+    else:
+        return False
     
 #****************************************************************
 while True:
@@ -89,7 +97,14 @@ while True:
     
     #MÓDULO DEPÓSITO
     if opcao == 'D':
-        cpf_usuario = input("Digite o CPF do titular da conta: ").strip()   
+        while True:
+            cpf_usuario = input("Digite o CPF do titular da conta: ").strip() 
+            validador = valida_cpf(cpf_usuario)
+            if validador == True:
+                break
+            else:
+                print('Digite um CPF válido!')
+
         busca = buscar_usuario(usuarios,cpf_usuario)#buscando usuario no banco de dados
         
         if isinstance(busca,dict):#caso o usuario exista, é hora de verificar se possui conta aberta
