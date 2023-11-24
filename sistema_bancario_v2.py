@@ -24,7 +24,7 @@ def sacar(*,valor_saque,saldo_total):#argumentos chamados apenas por nomes
     return saldo_atual    
 #****************************************************************
 #**********Função para extrato**********************************
-def mostrar_extrato(num_conta,contas,extrato): 
+def mostrar_extrato(num_conta,contas,/,*,extrato): 
     for item in contas:
         if item['conta'] == num_conta:
             print(f"Conta Nº: {num_conta}\nAgência: 0001\n{'-' *31}")
@@ -290,20 +290,32 @@ while True:
 
 #MÓDULO EXTRATO
     elif opcao == 'E':
-        while True:#laço para a escolha da conta até um numero de conta valido ser digitado
-            escolha_conta = int(input('Digite o N° da conta que deseja visualizar o extrato: '))
-            teste_while = False #teste para caso o numero digitado não coincida com nenhuma conta do usuario
-                        
-            for item in extrato:
-                if escolha_conta == item['conta']:
-                    teste_while = True
-                    print(f"{'*'*31}\n{'E X T R A T O':^31}\n{'_'*31}")
-                    mostrar_extrato(escolha_conta,contas,extrato)
-                    print(f"{'*' *31}")  
-            if teste_while == True:
-                break #parada do laço while
-            else:
-                print(f"Conta digitada não coincide com nenhuma conta cadastrada ou a mesma não há movimentação")
+        if extrato != []:
+            while True:#laço para a escolha da conta até um numero de conta valido ser digitado
+                escolha_conta = int(input('Digite o N° da conta que deseja visualizar o extrato: '))
+                teste_while = False #teste para caso o numero digitado não coincida com nenhuma conta do usuario
+                            
+                for item in extrato:
+                    if escolha_conta == item['conta']:
+                        teste_while = True
+                        print(f"{'*'*31}\n{'E X T R A T O':^31}\n{'_'*31}")
+                        mostrar_extrato(escolha_conta,contas,extrato=extrato)
+                        print(f"{'*' *31}")  
+                if teste_while == True:
+                    break #parada do laço while
+                else:
+                    teste_conta = False
+                    for conta in contas:
+                        if escolha_conta == conta['conta']:
+                            teste_conta = True    
+                            print(f"{'*'*31}\n{'E X T R A T O':^31}\n{'_'*31}")
+                            print(f"Não houve movimentação!")
+                            print(f"Saldo: R$ {conta['saldo']:.2f}")
+                            print(f"{'*' *31}")
+                    if teste_conta != True:
+                        print('Esta conta não existe!')  
+        else:
+            print('Não há nenhuma movimentação!')
 
 #MÓDULO CADASTRO DE USUÁRIO
     elif opcao == 'C':
